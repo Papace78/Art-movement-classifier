@@ -2,8 +2,16 @@ pytest
 pylint
 ipdb
 jupyterlab
+
 numpy
 pandas
+
 matplotlib
 seaborn
+
 scikit-learn
+tensorflow
+
+#for cv2
+opencv-python
+filetype
