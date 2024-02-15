@@ -6,7 +6,7 @@ baseline model
 
 
 Issue faced: \
-Dataset selection \
+Dataset subfolder selection dans l'iterateur tf\
 Model training too large \
 Cannot upload dataset to collab
 
