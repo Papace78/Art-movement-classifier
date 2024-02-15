@@ -1,22 +1,22 @@
-15-fev-24 / Jeudi:\
+# 15-fev-24 / Jeudi:
 
 Selection des 13 classes les plus representees  (<2K paintings) \
 loader dans un iterateur tf avec scaling \
-baseline model \
+baseline model
 
 
 Issue faced: \
 Dataset selection \
 Model training too large \
-Cannot upload dataset to collab \
+Cannot upload dataset to collab
 
 To be done de son coté:\
-baseline model \
+baseline model
 
 To be done samedi: \
 diviser les tasks \
 distincteur ? Check dnas chaque style: \
-  Taille/Ratio des tableaux ? Couleurs ? Luminosité ? \
+  Taille/Ratio des tableaux ? Couleurs ? Luminosité ?
 
-To be looked into:
+To be looked into:\
 Data augmentation
