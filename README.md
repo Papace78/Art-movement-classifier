@@ -20,3 +20,30 @@ distincteur ? Check dnas chaque style: \
 
 To be looked into:\
 Data augmentation
+
+
+# 17-fev-24 / Samedi:
+
+Creation d'un fichier .py pour le moduler ensuite.
+Separation du code en plein de fonctions
+
+Entrainement d'un modele basique, il overfit et ne fait pas mieux que baseline.
+
+Impossibilité de charger tout le dataset en numparray ou dataframe (il faut 25go de ram)\
+A la place, creation de l'array style par style possible.
+
+
+Creation d'un GCP_PROJECT, d'un BUCKET et d'une INSTANCE VM
+Installation python et quelques dependencies basiques dans VM
+Upload de tout le dataset dans VM.
+
+
+
+to be done:
+
+Status à enlever dans cubisme
+Nettoyer le dataset !
+
+Creer un tableau moyen par style
+Creer histogram montrant intensité pixel moyenne par style (et la variance ?)
+Creer piechart montrant couleurs moyennes par style (et la variance ?)
