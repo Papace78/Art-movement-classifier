@@ -15,3 +15,5 @@ tensorflow
 #for cv2
 opencv-python
 filetype
+
+colorama

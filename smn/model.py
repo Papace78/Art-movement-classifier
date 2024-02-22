@@ -3,20 +3,23 @@ from tensorflow.keras.layers import Conv2D, MaxPooling2D, Dense, Flatten, Dropou
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.losses import SparseCategoricalCrossentropy
 
+from colorama import Fore, Style
+import time
+
 def initialize_model():
     model = Sequential()
 
-    model.add(Conv2D(32, (3,3), 1, activation = 'relu', kernel_initializer='he_uniform', input_shape = (512,512,3)))
-    model.add(Conv2D(32, (3,3), 1, activation = 'relu', kernel_initializer='he_uniform'))
+    model.add(Conv2D(32, (3,3), 1, activation = 'relu', kernel_initializer='he_uniform', padding = 'same', input_shape = (512,512,3)))
+    #model.add(Conv2D(32, (3,3), 1, activation = 'relu', kernel_initializer='he_uniform', padding = 'same'))
     model.add(MaxPooling2D())
 
-    model.add(Conv2D(64, (3,3), 1, activation = 'relu', kernel_initializer='he_uniform'))
+    """model.add(Conv2D(64, (3,3), 1, activation = 'relu', kernel_initializer='he_uniform'))
     model.add(Conv2D(64, (3,3), 1, activation = 'relu', kernel_initializer='he_uniform'))
     model.add(MaxPooling2D())
 
     model.add(Conv2D(128, (3,3), 1, activation = 'relu', kernel_initializer='he_uniform'))
     model.add(Conv2D(128, (3,3), 1, activation = 'relu', kernel_initializer='he_uniform'))
-    model.add(MaxPooling2D())
+    model.add(MaxPooling2D())"""
 
     model.add(Flatten())
 
@@ -37,3 +40,21 @@ def compile_model(model,
         metrics = ['accuracy'])
 
     return model
+
+def evaluate_model(model, test_generator):
+
+    print(Fore.BLUE + f"\nEvaluating model on {len(test_generator)} rows..." + Style.RESET_ALL)
+
+    metrics = model.evaluate(
+        test_generator,
+        verbose=0,
+        # callbacks=None,
+        return_dict=True
+    )
+
+    loss = metrics["loss"]
+    accuracy = metrics['accuracy']
+
+    print(f"✅ Model evaluated, MAE: {round(accuracy, 2)}")
+
+    return metrics
