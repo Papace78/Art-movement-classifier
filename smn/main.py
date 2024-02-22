@@ -54,4 +54,6 @@ def main():
         callbacks = [es, checkpoint]
     )
 
-    return history
+
+    metrics = evaluate_model(model, test_generator=test_generator)
+    pass
