@@ -45,3 +45,5 @@ def plot_paintings(nb, styles: list):
             axs[j].imshow(image)
 
     plt.show()
+
+
