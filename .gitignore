@@ -1,8 +1,30 @@
 raw_data/
 .python-version
 .env
+.envrc
 
+# Jupiter Notebook #
 notebooks/
-*.ipynb
+.pytest_cache
+__pycache__
+*checkpoint.ipynb
+*.ipynb_checkpoints
 
 model/
+
+
+.gitignore
+
+smn.egg-info/
+
+# inteliJ #
+.idea
+*.gz
+*PKG-INFO
+*.egg-info
+*.csv
+
+*.zip
+*.sqlite
+# IDE #
+*.vscode
