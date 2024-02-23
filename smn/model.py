@@ -10,13 +10,13 @@ def initialize_model():
     model = Sequential()
 
     model.add(Conv2D(32, (3,3), 1, activation = 'relu', kernel_initializer='he_uniform', padding = 'same', input_shape = (512,512,3)))
-    #model.add(Conv2D(32, (3,3), 1, activation = 'relu', kernel_initializer='he_uniform', padding = 'same'))
+    model.add(Conv2D(32, (3,3), 1, activation = 'relu', kernel_initializer='he_uniform', padding = 'same'))
     model.add(MaxPooling2D())
 
-    """model.add(Conv2D(64, (3,3), 1, activation = 'relu', kernel_initializer='he_uniform'))
-    model.add(Conv2D(64, (3,3), 1, activation = 'relu', kernel_initializer='he_uniform'))
+    model.add(Conv2D(64, (3,3), 1, activation = 'relu', kernel_initializer='he_uniform', padding = 'same'))
+    model.add(Conv2D(64, (3,3), 1, activation = 'relu', kernel_initializer='he_uniform', padding = 'same'))
     model.add(MaxPooling2D())
-
+    """
     model.add(Conv2D(128, (3,3), 1, activation = 'relu', kernel_initializer='he_uniform'))
     model.add(Conv2D(128, (3,3), 1, activation = 'relu', kernel_initializer='he_uniform'))
     model.add(MaxPooling2D())"""
@@ -37,7 +37,7 @@ def compile_model(model,
     model.compile(
         optimizer = Adam(learning_rate = learning_rate),
         loss = loss,
-        metrics = ['accuracy'])
+        metrics = metrics)
 
     return model
 
