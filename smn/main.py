@@ -4,6 +4,7 @@ from tensorflow.keras.losses import SparseCategoricalCrossentropy
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
 import tensorflow as tf
 import pandas as pd
+import numpy as np
 
 
 from smn.data import *
@@ -14,8 +15,11 @@ from smn.params import *
 def main():
 
     data_df = get_data(image_dir = IMAGE_DIR)
+    print(f"✅ Data loaded, with shape {data_df.shape}")
 
     data_2k = extract_from_data(data_df, images_per_style = IMAGES_PER_STYLE)
+    print(f"✅ Data extracted, with shape {data_2k.shape}")
+
 
     X_train, X_val, X_test, y_train, y_val, y_test = split_data(data_2k,
                                                                 train_size = 0.9,
@@ -46,6 +50,7 @@ def main():
         save_freq = 100
     )
 
+    print(Fore.BLUE + "\nTraining model..." + Style.RESET_ALL)
 
     history = model.fit(
         train_generator,
@@ -54,6 +59,10 @@ def main():
         callbacks = [es, checkpoint]
     )
 
+    print(f"✅ Model trained on {len(train_generator)} rows with min val accuracy: {round(np.min(history.history['val_accuracy']), 2)}")
 
     metrics = evaluate_model(model, test_generator=test_generator)
+
+    learning_curves(history)
+
     pass
