@@ -1,10 +1,12 @@
+import sys
+
+from colorama import Fore, Style
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Conv2D, MaxPooling2D, Dense, Flatten, Dropout
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.losses import SparseCategoricalCrossentropy
+import matplotlib.pyplot as plt
 
-from colorama import Fore, Style
-import time
 
 def initialize_model():
     model = Sequential()
@@ -16,15 +18,17 @@ def initialize_model():
     model.add(Conv2D(64, (3,3), 1, activation = 'relu', kernel_initializer='he_uniform', padding = 'same'))
     model.add(Conv2D(64, (3,3), 1, activation = 'relu', kernel_initializer='he_uniform', padding = 'same'))
     model.add(MaxPooling2D())
-    """
+
     model.add(Conv2D(128, (3,3), 1, activation = 'relu', kernel_initializer='he_uniform'))
     model.add(Conv2D(128, (3,3), 1, activation = 'relu', kernel_initializer='he_uniform'))
-    model.add(MaxPooling2D())"""
+    model.add(MaxPooling2D())
 
     model.add(Flatten())
 
     model.add(Dense(128, activation = 'relu'))
     model.add(Dense(13, activation = 'softmax'))
+
+    print("✅ Model initialized")
 
     return model
 
@@ -38,6 +42,8 @@ def compile_model(model,
         optimizer = Adam(learning_rate = learning_rate),
         loss = loss,
         metrics = metrics)
+
+    print("✅ Model compiled")
 
     return model
 
@@ -55,6 +61,22 @@ def evaluate_model(model, test_generator):
     loss = metrics["loss"]
     accuracy = metrics['accuracy']
 
-    print(f"✅ Model evaluated, MAE: {round(accuracy, 2)}")
+    print(f"✅ Model evaluated, accuracy: {round(accuracy*100, 2)}%")
 
     return metrics
+
+def learning_curves(history):
+    # plot loss
+    plt.subplot(211)
+    plt.title('Loss')
+    plt.plot(history.history['loss'], color='blue', label='train')
+    plt.plot(history.history['val_loss'], color='orange', label='test')
+    # plot accuracy
+    plt.subplot(212)
+    plt.title('Accuracy')
+    plt.plot(history.history['accuracy'], color='blue', label='train')
+    plt.plot(history.history['val_accuracy'], color='orange', label='test')
+    # save plot to file
+    filename = sys.argv[0].split('/')[-1]
+    plt.savefig(filename + '_plot.png')
+    plt.close()
