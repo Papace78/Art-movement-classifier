@@ -2,7 +2,7 @@ import sys
 
 from colorama import Fore, Style
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Conv2D, MaxPooling2D, Dense, Flatten, Dropout
+from tensorflow.keras.layers import Conv2D, MaxPooling2D, Dense, Flatten, Dropout, BatchNormalization
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.losses import SparseCategoricalCrossentropy
 import matplotlib.pyplot as plt
@@ -12,20 +12,31 @@ def initialize_model():
     model = Sequential()
 
     model.add(Conv2D(32, (3,3), 1, activation = 'relu', kernel_initializer='he_uniform', padding = 'same', input_shape = (512,512,3)))
+    model.add(BatchNormalization(momentum = 0.9))
     model.add(Conv2D(32, (3,3), 1, activation = 'relu', kernel_initializer='he_uniform', padding = 'same'))
+    model.add(BatchNormalization(momentum = 0.9))
     model.add(MaxPooling2D())
+    model.add(Dropout(0.1))
 
     model.add(Conv2D(64, (3,3), 1, activation = 'relu', kernel_initializer='he_uniform', padding = 'same'))
+    model.add(BatchNormalization(momentum = 0.9))
     model.add(Conv2D(64, (3,3), 1, activation = 'relu', kernel_initializer='he_uniform', padding = 'same'))
+    model.add(BatchNormalization(momentum = 0.9))
     model.add(MaxPooling2D())
+    model.add(Dropout(0.2))
 
     model.add(Conv2D(128, (3,3), 1, activation = 'relu', kernel_initializer='he_uniform'))
+    model.add(BatchNormalization(momentum = 0.9))
     model.add(Conv2D(128, (3,3), 1, activation = 'relu', kernel_initializer='he_uniform'))
+    model.add(BatchNormalization(momentum = 0.9))
     model.add(MaxPooling2D())
+    model.add(Dropout(0.4))
 
     model.add(Flatten())
 
     model.add(Dense(128, activation = 'relu'))
+    model.add(BatchNormalization(momentum = 0.9))
+    model.add(Dropout(0.5))
     model.add(Dense(13, activation = 'softmax'))
 
     print("✅ Model initialized")
