@@ -17,7 +17,7 @@ def main():
     data_df = get_data(image_dir = IMAGE_DIR)
     print(f"✅ Data loaded, with shape {data_df.shape}")
 
-    data_2k = extract_from_data(data_df, images_per_style = IMAGES_PER_STYLE)
+    data_2k = extract_from_data(data_df, images_per_style = 4000)
     print(f"✅ Data extracted, with shape {data_2k.shape}")
 
 
