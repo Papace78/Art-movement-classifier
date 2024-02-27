@@ -23,14 +23,14 @@ def initialize_model():
     model.add(Conv2D(64, (3,3), 1, activation = 'relu', kernel_initializer='he_uniform', padding = 'same'))
     model.add(BatchNormalization(momentum = 0.9))
     model.add(MaxPooling2D())
-    model.add(Dropout(0.2))
+    model.add(Dropout(0.4))
 
-    model.add(Conv2D(128, (3,3), 1, activation = 'relu', kernel_initializer='he_uniform'))
+    """model.add(Conv2D(128, (3,3), 1, activation = 'relu', kernel_initializer='he_uniform'))
     model.add(BatchNormalization(momentum = 0.9))
     model.add(Conv2D(128, (3,3), 1, activation = 'relu', kernel_initializer='he_uniform'))
     model.add(BatchNormalization(momentum = 0.9))
     model.add(MaxPooling2D())
-    model.add(Dropout(0.4))
+    model.add(Dropout(0.4))"""
 
     model.add(Flatten())
 
