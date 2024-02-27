@@ -1,7 +1,7 @@
 
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.losses import SparseCategoricalCrossentropy
-from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
+from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau
 from colorama import Fore, Style
 import tensorflow as tf
 import pandas as pd
@@ -38,16 +38,19 @@ def main():
     model = initialize_model()
     model = compile_model(model,
                           optimizer = Adam(),
-                          loss = SparseCategoricalCrossentropy(from_logits = True),
+                          loss = SparseCategoricalCrossentropy(),
                           metrics = ['accuracy'],
                           learning_rate = 0.001)
 
 
-    es = EarlyStopping(patience = 3, monitor = 'val_loss', restore_best_weights = True)
+
+    es = EarlyStopping(patience = 15, monitor = 'val_loss', restore_best_weights = True)
+
+    LRreducer = ReduceLROnPlateau(monitor="val_loss", factor = 0.1, patience=3, verbose=1, min_lr=0)
 
     checkpoint = ModelCheckpoint(
         filepath = '../model',
-        save_freq = 100
+        save_freq = 200
     )
 
     print(Fore.BLUE + "\nTraining model..." + Style.RESET_ALL)
@@ -55,8 +58,8 @@ def main():
     history = model.fit(
         train_generator,
         validation_data = val_generator,
-        epochs = 200,
-        callbacks = [es, checkpoint]
+        epochs = 1000,
+        callbacks = [es, checkpoint, LRreducer]
     )
 
     print(f"✅ Model trained on {len(train_generator)} rows with min val accuracy: {round(np.min(history.history['val_accuracy']), 2)}")
