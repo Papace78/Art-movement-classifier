@@ -12,9 +12,16 @@ def get_data(image_dir = './data/wikiart/in_work') -> pd.DataFrame:
 
     data_dict = {'path':[] ,'style': []}
     for style in os.listdir(image_dir):
-        for image in os.listdir(os.path.join(image_dir,style)):
-            data_dict['style'].append(style)
-            data_dict['path'].append(image)
+
+        if style not in ['Rococo',
+                         'Abstract_Expressionism',
+                         'Cubism',
+                         'Northern_Renaissance',
+                         'Naive_Art_Primitivism']:
+
+            for image in os.listdir(os.path.join(image_dir,style)):
+                data_dict['style'].append(style)
+                data_dict['path'].append(image)
 
     data_df = pd.DataFrame(data_dict)
 
