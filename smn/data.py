@@ -31,7 +31,6 @@ def get_data(image_dir = './data/wikiart/in_work') -> pd.DataFrame:
     style_to_label = {style : i for i, style in enumerate(data_df['style'].unique())}
     data_df['style_label'] = data_df['style'].map(style_to_label)
 
-    print(f"✅ Data loaded, with shape {data_df.shape}")
 
     return data_df
 
