@@ -5,12 +5,13 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Conv2D, MaxPooling2D, Dense, Flatten, Dropout, BatchNormalization, RandomFlip, RandomZoom, RandomTranslation, RandomRotation
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.losses import SparseCategoricalCrossentropy
+from keras.regularizers import l1_l2
+
 import matplotlib.pyplot as plt
 
 
 def initialize_model():
     model = Sequential()
-
 
     #Data Augmentation
     model.add(RandomFlip("horizontal"))
