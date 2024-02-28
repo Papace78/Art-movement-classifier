@@ -13,4 +13,6 @@ vgg3 ==> 6 epoch / loss: 2.61 / acc: 0.082 / val_loss: 2.57 / val_acc: 0.067
 vgg3+dropout ==> 7 epoch / loss: 0.745 / acc: 0.76 / val_loss: 2.50 / val_acc: 0.32
 	test_accuracy = 31.46%
 
+vgg3+dropout-4k ==> 6 epoch / loss: 1.00 / acc: 0.65 / val_loss: 1.86 / val_acc: 0.38
+	test_accuracy = 37.87%
 
