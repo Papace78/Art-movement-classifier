@@ -2,7 +2,7 @@ import sys
 
 from colorama import Fore, Style
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Conv2D, MaxPooling2D, Dense, Flatten, Dropout, BatchNormalization
+from tensorflow.keras.layers import Conv2D, MaxPooling2D, Dense, Flatten, Dropout, BatchNormalization, RandomFlip, RandomZoom, RandomTranslation, RandomRotation
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.losses import SparseCategoricalCrossentropy
 from keras.regularizers import l1_l2
@@ -13,41 +13,56 @@ import matplotlib.pyplot as plt
 def initialize_model():
     model = Sequential()
 
-    model.add(Conv2D(32, (3,3), 1, activation = 'relu', kernel_initializer='he_uniform', padding = 'same', kernel_regularizer=l1_l2(), input_shape = (512,512,3)))
+    #Data Augmentation
+    model.add(RandomFlip("horizontal"))
+    model.add(RandomZoom(0.1))
+    model.add(RandomTranslation(0.2, 0.2))
+    model.add(RandomRotation(0.1))
+
+    #CNN
+    model.add(Conv2D(128, (3,3), 1, activation = 'relu', padding = 'same', input_shape = (512,512,3)))
     model.add(BatchNormalization(momentum = 0.9))
-    model.add(Conv2D(32, (3,3), 1, activation = 'relu', kernel_initializer='he_uniform', padding = 'same', kernel_regularizer=l1_l2()))
+    """model.add(Conv2D(128, (3,3), 1, activation = 'relu', padding = 'same'))
+    model.add(BatchNormalization(momentum = 0.9))"""
+    model.add(MaxPooling2D())
+    model.add(Dropout(0.05))
+
+    model.add(Conv2D(64, (3,3), 1, activation = 'relu', padding = 'same'))
     model.add(BatchNormalization(momentum = 0.9))
+    """model.add(Conv2D(64, (3,3), 1, activation = 'relu', padding = 'same'))
+    model.add(BatchNormalization(momentum = 0.9))"""
     model.add(MaxPooling2D())
     model.add(Dropout(0.1))
 
-    model.add(Conv2D(64, (3,3), 1, activation = 'relu', kernel_initializer='he_uniform', padding = 'same', kernel_regularizer=l1_l2()))
+    model.add(Conv2D(32, (3,3), 1, activation = 'relu'))
     model.add(BatchNormalization(momentum = 0.9))
-    model.add(Conv2D(64, (3,3), 1, activation = 'relu', kernel_initializer='he_uniform', padding = 'same', kernel_regularizer=l1_l2()))
-    model.add(BatchNormalization(momentum = 0.9))
+    """model.add(Conv2D(32, (3,3), 1, activation = 'relu'))
+    model.add(BatchNormalization(momentum = 0.9))"""
     model.add(MaxPooling2D())
     model.add(Dropout(0.2))
 
-    model.add(Conv2D(128, (3,3), 1, activation = 'relu', kernel_initializer='he_uniform', kernel_regularizer=l1_l2()))
-    model.add(BatchNormalization(momentum = 0.9))
-    model.add(Conv2D(128, (3,3), 1, activation = 'relu', kernel_initializer='he_uniform', kernel_regularizer=l1_l2()))
-    model.add(BatchNormalization(momentum = 0.9))
-    model.add(MaxPooling2D())
-    model.add(Dropout(0.4))
-
     model.add(Flatten())
 
-    model.add(Dense(128, activation = 'relu', kernel_regularizer=l1_l2()))
+    #Dense
+    model.add(Dense(128, activation = 'relu'))
     model.add(BatchNormalization(momentum = 0.9))
-    model.add(Dropout(0.5))
-    model.add(Dense(13, activation = 'softmax'))
+    model.add(Dropout(0.3))
+
+    model.add(Dense(64, activation = 'relu'))
+    model.add(BatchNormalization(momentum = 0.9))
+    model.add(Dropout(0.4))
+
+    model.add(Dense(8, activation = 'softmax'))
 
     print("✅ Model initialized")
 
     return model
 
+
+
 def compile_model(model,
                    optimizer = Adam(),
-                   loss = SparseCategoricalCrossentropy(from_logits=True),
+                   loss = SparseCategoricalCrossentropy(),
                    metrics = ['accuracy'],
                    learning_rate = 0.001):
 

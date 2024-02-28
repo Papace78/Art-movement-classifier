@@ -1,5 +1,6 @@
 import os
 
+from colorama import Fore, Style
 from sklearn.model_selection import train_test_split
 import pandas as pd
 import tensorflow as tf
@@ -24,6 +25,7 @@ def get_data(image_dir = './data/wikiart/in_work') -> pd.DataFrame:
                 data_dict['path'].append(image)
 
     data_df = pd.DataFrame(data_dict)
+    print(Fore.BLUE + f"\ndataset with {len(data_df['style'].unique())} labels" + Style.RESET_ALL)
 
     #add two new columns
 
