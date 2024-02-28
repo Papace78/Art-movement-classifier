@@ -5,7 +5,7 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Conv2D, MaxPooling2D, Dense, Flatten, Dropout, BatchNormalization, RandomFlip, RandomZoom, RandomTranslation, RandomRotation
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.losses import SparseCategoricalCrossentropy
-from keras.regularizers import l1_l2
+
 
 import matplotlib.pyplot as plt
 
@@ -22,22 +22,22 @@ def initialize_model():
     #CNN
     model.add(Conv2D(128, (3,3), 1, activation = 'relu', padding = 'same', input_shape = (512,512,3)))
     model.add(BatchNormalization(momentum = 0.9))
-    """model.add(Conv2D(128, (3,3), 1, activation = 'relu', padding = 'same'))
-    model.add(BatchNormalization(momentum = 0.9))"""
+    model.add(Conv2D(128, (3,3), 1, activation = 'relu', padding = 'same'))
+    model.add(BatchNormalization(momentum = 0.9))
     model.add(MaxPooling2D())
     model.add(Dropout(0.05))
 
     model.add(Conv2D(64, (3,3), 1, activation = 'relu', padding = 'same'))
     model.add(BatchNormalization(momentum = 0.9))
-    """model.add(Conv2D(64, (3,3), 1, activation = 'relu', padding = 'same'))
-    model.add(BatchNormalization(momentum = 0.9))"""
+    model.add(Conv2D(64, (3,3), 1, activation = 'relu', padding = 'same'))
+    model.add(BatchNormalization(momentum = 0.9))
     model.add(MaxPooling2D())
     model.add(Dropout(0.1))
 
     model.add(Conv2D(32, (3,3), 1, activation = 'relu'))
     model.add(BatchNormalization(momentum = 0.9))
-    """model.add(Conv2D(32, (3,3), 1, activation = 'relu'))
-    model.add(BatchNormalization(momentum = 0.9))"""
+    model.add(Conv2D(32, (3,3), 1, activation = 'relu'))
+    model.add(BatchNormalization(momentum = 0.9))
     model.add(MaxPooling2D())
     model.add(Dropout(0.2))
 
@@ -99,12 +99,13 @@ def learning_curves(history):
     plt.title('Loss')
     plt.plot(history.history['loss'], color='blue', label='train')
     plt.plot(history.history['val_loss'], color='orange', label='test')
+    plt.legend()
     # plot accuracy
     plt.subplot(212)
     plt.title('Accuracy')
     plt.plot(history.history['accuracy'], color='blue', label='train')
     plt.plot(history.history['val_accuracy'], color='orange', label='test')
+    plt.legend()
     # save plot to file
-    filename = sys.argv[0].split('/')[-1]
-    plt.savefig(filename + '_plot.png')
+    plt.savefig('entonnoir_doublecouche.png')
     plt.close()
