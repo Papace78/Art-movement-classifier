@@ -17,3 +17,6 @@ opencv-python
 filetype
 
 colorama
+
+scikit-image
+tqdm

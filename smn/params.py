@@ -2,7 +2,7 @@ import os
 
 IMAGE_DIR = os.environ.get('IMAGE_DIR')
 
-IMAGES_PER_STYLE = int(os.environ.get('IMAGES_PER_STYLE'))
+PAINTINGS_PER_STYLE = int(os.environ.get('PAINTINGS_PER_STYLE'))
 
 
 DATASET_PATH = os.environ.get('DATASET_PATH')

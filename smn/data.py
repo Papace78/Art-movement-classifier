@@ -39,7 +39,7 @@ def get_data(image_dir = './data/wikiart/in_work') -> pd.DataFrame:
 
 def extract_from_data(df: pd.DataFrame, images_per_style = 2000) -> pd.DataFrame:
 
-    return df.groupby('style').head(images_per_style)
+    return df.groupby('style').sample(images_per_style)
 
 
 
