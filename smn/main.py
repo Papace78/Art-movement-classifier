@@ -150,6 +150,7 @@ def main():
         print(f"✅ Data test, with shape {data_test.shape}")
 
         accuracy_average = round(evaluate_no_ai(data_test, method = 'average') * 100, 2)
+        print(accuracy_average)
         accuracy_dominant = round(evaluate_no_ai(data_test, method = 'dominant') * 100, 2)
 
 
