@@ -9,6 +9,10 @@ from tensorflow.keras.losses import SparseCategoricalCrossentropy
 
 import matplotlib.pyplot as plt
 
+"""
+French Handmade model, with learning curves results
+"""
+
 
 def initialize_model():
     model = Sequential()

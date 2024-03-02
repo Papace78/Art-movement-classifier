@@ -20,6 +20,8 @@ from smn.params import IMAGE_DIR
 WITHOUT_AI = False
 IMAGES_PER_STYLE = 4000
 N_LABELS = 8
+BATCH_SIZE = 16
+
 
 def main():
 
@@ -143,7 +145,8 @@ def main():
         X_test = X_test,
         y_train = y_train,
         y_val = y_val,
-        y_test = y_test)
+        y_test = y_test,
+        batch_size= BATCH_SIZE)
 
 
     #--------------CREATE MODEL--------------
