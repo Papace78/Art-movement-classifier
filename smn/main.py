@@ -19,6 +19,8 @@ from smn.params import IMAGE_DIR
 WITHOUT_AI = False
 IMAGES_PER_STYLE = 4000
 N_LABELS = 8
+BATCH_SIZE = 16
+
 
 
 def main():
@@ -149,6 +151,7 @@ def main():
 
         accuracy_average = round(evaluate_no_ai(data_test, method = 'average') * 100, 2)
         accuracy_dominant = round(evaluate_no_ai(data_test, method = 'dominant') * 100, 2)
+
 
 
         return print({'accuracy_average %' : accuracy_average,
