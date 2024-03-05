@@ -55,6 +55,8 @@ def train_model(model, train, val):
         monitor="val_loss", factor=0.1, patience=3, verbose=1, min_lr=0
     )
 
+    print(Fore.BLUE + f"\ntraining model on {len(train)} rows..." + Style.RESET_ALL)
+
     history = model.fit(
         train,
         validation_data=val,

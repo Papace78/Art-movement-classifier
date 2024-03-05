@@ -37,5 +37,6 @@ def classification():
 
     print(metrics)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     classification()

@@ -2,7 +2,7 @@ import tensorflow as tf
 import os
 
 from transfer_learning.components.sorter import Sorter
-from tensorflow.keras.preprocessing.image import ImageDataGenerator
+from colorama import Style, Fore
 
 
 class Paintings:
@@ -15,7 +15,7 @@ class Paintings:
         validation_split=0.2,
     ):
 
-        self.sorter = Sorter()
+        self.sorter = sorter
         self.batch_size = batch_size
         self.image_size = image_size
         self.validation_split = validation_split
@@ -24,14 +24,18 @@ class Paintings:
         self.sorter.sort()
 
     def where(self):
-        print(f"trainval_dir : {self.sorter.trainval_dir}")
-        print(f"\ncontaining: {os.listdir(self.sorter.trainval_dir)}")
+        print(
+            Fore.BLUE + f"\n{self.sorter.trainval_dir}" + Style.RESET_ALL
+        )
+        print(f"containing: {os.listdir(self.sorter.trainval_dir)}")
 
-        print(f"\n\ntest_dir : {self.sorter.test_dir}")
-        print(f"\ncontaining: {os.listdir(self.sorter.test_dir)}")
+        print(Fore.BLUE + f"\n\n{self.sorter.test_dir}" + Style.RESET_ALL)
+        print(f"containing: {os.listdir(self.sorter.test_dir)}\n\n")
 
 
     def fetch(self):
+        print("\n\nFetching:")
+        self.where()
 
         train, validation = tf.keras.utils.image_dataset_from_directory(
             self.sorter.trainval_dir,
@@ -55,6 +59,5 @@ class Paintings:
         train_ds = train.prefetch(tf.data.experimental.AUTOTUNE)
         val_ds = validation.prefetch(tf.data.experimental.AUTOTUNE)
         test_ds = test.prefetch(tf.data.experimental.AUTOTUNE)
-
 
         return train_ds, val_ds, test_ds
