@@ -1,6 +1,6 @@
 import typer
 
-from transfer_learning.components.core import classification
+from transfer_learning.components.core import classification, prediction
 
 
 app = typer.Typer(add_completion=False)
@@ -21,5 +21,11 @@ def classify(
         n_classes=n_classes,
     )
 
+@app.command()
+def predict(test_ds = 'raw_data/wikiart/test_directory'):
+
+    predict = prediction(test_dataset=test_ds)
+
+    return {'prediction' : predict}
 
 app()
