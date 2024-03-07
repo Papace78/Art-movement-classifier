@@ -23,7 +23,7 @@ class My_Model:
     def __init__(self):
         pass
 
-    def initialize_model(self, n_classes=8, class_weights = {}):
+    def initialize_model(self, n_classes=8):
         """
         Compiles a model integrated with VGG16 pretrained layers
 
