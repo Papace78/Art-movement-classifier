@@ -1,8 +1,4 @@
-from keras.models import Model
-from keras.optimizers import Adam
-from keras.applications.vgg16 import VGG16, preprocess_input
 from keras.layers import (
-    Input,
     Dense,
     Dropout,
     GlobalAveragePooling2D,
@@ -11,17 +7,20 @@ from keras.layers import (
     RandomZoom,
     RandomWidth,
 )
+from keras.callbacks import ModelCheckpoint, EarlyStopping, ReduceLROnPlateau
 
 import tensorflow as tf
 
 
 class My_Model:
+
+    INPUT_SHAPE = (224, 224, 3)
+    LEARNING_RATE = 0.0001
+
     def __init__(self):
         pass
 
-    def initialize_model(
-        self, input_shape=(224, 224, 3), n_classes=8, optimizer=Adam(), fine_tune=0
-    ):
+    def initialize_model(self, n_classes=8, fine_tune=17):
         """
         Compiles a model integrated with VGG16 pretrained layers
 
@@ -37,29 +36,41 @@ class My_Model:
         data_augmentation = tf.keras.Sequential(
             [
                 RandomFlip("horizontal"),
-                RandomRotation(0.2),
-                RandomZoom(0.2),
+                RandomRotation(0.1),
+                RandomZoom(0.3),
                 RandomWidth(0.2),
             ]
         )
 
-        # ------VGG16
+        # --------SCALING
+        preprocess_input = tf.keras.applications.vgg16.preprocess_input
+
+        # --------VGG16
 
         # Pretrained convolutional layers are loaded using the Imagenet weights.
         # Include_top is set to False, in order to exclude the model's fully-connected layers.
-        conv_base = VGG16(
-            include_top=False, weights="imagenet", input_shape=input_shape
+        vgg16_model = tf.keras.applications.VGG16(
+            input_shape=self.INPUT_SHAPE, include_top=False, weights="imagenet"
         )
 
         # Defines how many layers to freeze during training.
         # Layers in the convolutional base are switched from trainable to non-trainable
         # depending on the size of the fine-tuning parameter.
-        if fine_tune > 0:
-            for layer in conv_base.layers[:-fine_tune]:
+        if fine_tune:
+            vgg16_model.trainable = True
+            print("\nnumber of layers in the base vgg16 model:", len(vgg16_model.layers))
+            print("number of trainable layers in the base vgg16 model:", len(vgg16_model.layers)-fine_tune)
+
+            learning_rate = self.LEARNING_RATE / 10
+
+            for layer in vgg16_model.layers[:fine_tune]:
                 layer.trainable = False
+
         else:
-            for layer in conv_base.layers:
-                layer.trainable = False
+            vgg16_model.trainable = False
+
+            learning_rate = self.LEARNING_RATE
+
 
         # ------CLASSIFICATION LAYERS
 
@@ -67,32 +78,94 @@ class My_Model:
         global_average_layer = GlobalAveragePooling2D()
         classification_layer1 = Dense(256, activation="relu")
         classification_layer2 = Dense(128, activation="relu")
-        dropout = Dropout(0.2)
 
         prediction_layer = Dense(n_classes, activation="softmax")
 
         # -------ARCHITECTURE
         # Create a new 'top' of the model (i.e. fully-connected layers).
         # This is 'bootstrapping' a new top_model onto the pretrained layers.
-        inputs = Input(shape=input_shape)
-        bottom_model = data_augmentation(inputs)
-        bottom_model = preprocess_input(bottom_model)
-        mid_model = conv_base(bottom_model)
-        top_model = global_average_layer(mid_model)
-        top_model = classification_layer1(top_model)
-        top_model = classification_layer2(top_model)
-        top_model = dropout(top_model)
-        output_layer = prediction_layer(top_model)
+        inputs = tf.keras.Input(shape=self.INPUT_SHAPE)
+        x = data_augmentation(inputs)
+        x = preprocess_input(x)
+        x = vgg16_model(x, training=False)
+        x = global_average_layer(x)
+        x = Dropout(0.2)(x)
+        x = classification_layer1(x)
+        x = classification_layer2(x)
+        x = Dropout(0.2)(x)
+        outputs = prediction_layer(x)
+        model = tf.keras.Model(inputs, outputs)
 
-        # Group the convolutional base and new fully-connected layers into a Model object.
-        model = Model(inputs=inputs, outputs=output_layer)
+        print(model.summary())
+        # only one layer trainable 4104 parameters divided into two cat: weight and bias
+        print("\nnumber of trainable variable:", len(model.trainable_variables))
 
         # -------COMPILE
         # Compiles the model for training.
         model.compile(
-            optimizer=optimizer,
-            loss="sparse_categorical_crossentropy",
-            metrics=["accuracy"],
+            optimizer=tf.keras.optimizers.Adam(learning_rate=learning_rate),
+            loss=tf.keras.losses.SparseCategoricalCrossentropy(),
+            metrics=[tf.keras.metrics.CategoricalAccuracy(name="accuracy")],
         )
 
         return model
+
+
+def train_model(model, train_dataset, validation_dataset):
+
+    initial_epochs = 1000
+    loss0, accuracy0 = model.evaluate(validation_dataset)
+    print("\ninitial loss: {:.2f}".format(loss0))
+    print("initial accuracy: {:.2f}".format(accuracy0))
+
+    ## Callbacks
+    checkpoint = ModelCheckpoint(
+        filepath="tl_model_v1.weights.best.hdf5", save_best_only=True, verbose=1
+    )
+    es = EarlyStopping(
+        monitor="val_loss", patience=10, restore_best_weights=True, mode="min"
+    )
+    LRreducer = ReduceLROnPlateau(
+        monitor="val_loss", factor=0.1, patience=3, verbose=1, min_lr=0
+    )
+
+    history = model.fit(
+        train_dataset,
+        validation_data=validation_dataset,
+        epochs=initial_epochs,
+        callbacks=[es, checkpoint, LRreducer],
+    )
+
+    return history
+
+
+def finetune_model(model, history, train_dataset, validation_dataset):
+
+    fine_tune_epochs = 100
+
+    ## Callbacks
+    checkpoint = ModelCheckpoint(
+        filepath="tl_model_v1.weights.best.hdf5", save_best_only=True, verbose=1
+    )
+    es = EarlyStopping(
+        monitor="val_loss", patience=10, restore_best_weights=True, mode="min"
+    )
+    LRreducer = ReduceLROnPlateau(
+        monitor="val_loss", factor=0.1, patience=3, verbose=1, min_lr=0
+    )
+
+    history_fine = model.fit(
+        train_dataset,
+        epochs=fine_tune_epochs,
+        initial_epochs=history.epoch[-1],
+        validation_data=validation_dataset,
+        callbacks=[es, checkpoint, LRreducer],
+    )
+
+    return history_fine
+
+
+def evaluate_model(model, test_dataset):
+    loss, accuracy = model.evaluate(test_dataset)
+    print("\nTest accuracy:", accuracy)
+    return accuracy

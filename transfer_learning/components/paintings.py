@@ -7,11 +7,12 @@ from colorama import Style, Fore
 
 class Paintings:
 
+
     def __init__(
         self,
         sorter=Sorter(),
         batch_size=32,
-        image_size=(224, 224),
+        image_size=(224,224),
         validation_split=0.2,
     ):
 
@@ -56,8 +57,10 @@ class Paintings:
             crop_to_aspect_ratio=True,
         )
 
-        train_ds = train.prefetch(tf.data.experimental.AUTOTUNE)
-        val_ds = validation.prefetch(tf.data.experimental.AUTOTUNE)
-        test_ds = test.prefetch(tf.data.experimental.AUTOTUNE)
+        AUTOTUNE = tf.data.AUTOTUNE
+
+        train_ds = train.prefetch(buffer_size=AUTOTUNE)
+        val_ds = validation.prefetch(buffer_size=AUTOTUNE)
+        test_ds = test.prefetch(buffer_size=AUTOTUNE)
 
         return train_ds, val_ds, test_ds

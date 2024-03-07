@@ -1,42 +1,48 @@
-from pipeline import (
+from transfer_learning.components.utils import (
     sort_files,
     get_data,
     create_model,
-    train_model,
-    evaluate_model,
     learning_curves,
 )
-from keras.optimizers import Adam
+from transfer_learning.components.model import train_model, finetune_model, evaluate_model
+
 import os
 from colorama import Fore, Style
 import numpy as np
 
 
-def classification():
-
+def classification(
+    finetune=17, batch_size=32, image_size=(224, 224), validation_split=0.2, n_classes=8
+):
+    print('\nFinetune =', finetune)
     if not "trainval_directory" in os.listdir("raw_data/wikiart/"):
         sort_files()
 
     train, val, test = get_data(
-        batch_size=32, image_size=(224, 224), validation_split=0.2
+        batch_size=batch_size, image_size=image_size, validation_split=validation_split
     )
 
-    vgg16 = create_model(
-        input_shape=(224, 224, 3), n_classes=8, optimizer=Adam(), fine_tune=0
-    )
+    vgg16 = create_model(n_classes=n_classes, fine_tune=finetune)
 
-    print(Fore.BLUE + "\nTraining model..." + Style.RESET_ALL)
+    print(Fore.BLUE + f"\nTraining model on {len(train)} rows..." + Style.RESET_ALL)
     history = train_model(vgg16, train, val)
 
     print(
         f"✅ Model trained on {len(train)} rows with min val accuracy: {round(np.min(history.history['val_accuracy']), 2)}"
     )
 
-    metrics = evaluate_model(vgg16, test)
-    learning_curves(history)
+    if finetune:
+        print(Fore.BLUE + f"\nFinetuning model on {len(train)} rows..." + Style.RESET_ALL)
+        history_fine = finetune_model(vgg16,history = history, train_dataset= train, validation_dataset=val)
 
-    print(metrics)
 
+    print(Fore.BLUE + f"\nTesting model on {len(test)} rows..." + Style.RESET_ALL)
+    accuracy = evaluate_model(vgg16, test)
+    print(f"✅ Model tested, accuracy: {round(accuracy*100, 2)}%")
 
-if __name__ == "__main__":
-    classification()
+    if finetune:
+        learning_curves(history_fine, title="finetunening")
+    else:
+        learning_curves(history, title="feature_extraction")
+
+    print(accuracy)
