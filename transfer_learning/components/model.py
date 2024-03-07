@@ -20,7 +20,7 @@ class My_Model:
     def __init__(self):
         pass
 
-    def initialize_model(self, n_classes=8, fine_tune=17):
+    def initialize_model(self, n_classes=8):
         """
         Compiles a model integrated with VGG16 pretrained layers
 
@@ -52,24 +52,8 @@ class My_Model:
         vgg16_model = tf.keras.applications.VGG16(
             input_shape=self.INPUT_SHAPE, include_top=False, weights="imagenet"
         )
-
-        # Defines how many layers to freeze during training.
-        # Layers in the convolutional base are switched from trainable to non-trainable
-        # depending on the size of the fine-tuning parameter.
-        if fine_tune:
-            vgg16_model.trainable = True
-            print("\nnumber of layers in the base vgg16 model:", len(vgg16_model.layers))
-            print("number of trainable layers in the base vgg16 model:", len(vgg16_model.layers)-fine_tune)
-
-            learning_rate = self.LEARNING_RATE / 10
-
-            for layer in vgg16_model.layers[:fine_tune]:
-                layer.trainable = False
-
-        else:
-            vgg16_model.trainable = False
-
-            learning_rate = self.LEARNING_RATE
+        vgg16_model.trainable = False
+        learning_rate = self.LEARNING_RATE
 
 
         # ------CLASSIFICATION LAYERS
@@ -113,6 +97,7 @@ class My_Model:
 
 def train_model(model, train_dataset, validation_dataset):
 
+    print('\nEvaluating initial loss and accuracy...')
     initial_epochs = 1000
     loss0, accuracy0 = model.evaluate(validation_dataset)
     print("\ninitial loss: {:.2f}".format(loss0))
@@ -129,6 +114,8 @@ def train_model(model, train_dataset, validation_dataset):
         monitor="val_loss", factor=0.1, patience=3, verbose=1, min_lr=0
     )
 
+    print("\nnumber of trainable variable:", len(model.trainable_variables))
+
     history = model.fit(
         train_dataset,
         validation_data=validation_dataset,
@@ -139,9 +126,20 @@ def train_model(model, train_dataset, validation_dataset):
     return history
 
 
-def finetune_model(model, history, train_dataset, validation_dataset):
+def finetune_model(model, history, train_dataset, validation_dataset, finetune):
 
-    fine_tune_epochs = 100
+    '''Make top vgg16 layers trainable and recompile'''
+    model.layers[4].trainable = True
+
+
+    for layer in model.layers[4].layers[:finetune]:
+        layer.trainable = False
+
+    print("\nnumber of layers in the base vgg16 model:", len(model.layers[4].layers))
+    print("number of trainable layers in the base vgg16 model:", len(model.layers[4].layers)-finetune)
+    print("\nnumber of trainable variable:", len(model.trainable_variables))
+
+    fine_tune_epochs = 1000
 
     ## Callbacks
     checkpoint = ModelCheckpoint(
@@ -153,6 +151,12 @@ def finetune_model(model, history, train_dataset, validation_dataset):
     LRreducer = ReduceLROnPlateau(
         monitor="val_loss", factor=0.1, patience=3, verbose=1, min_lr=0
     )
+
+    model.compile(
+            optimizer=tf.keras.optimizers.Adam(learning_rate=0.00001),
+            loss=tf.keras.losses.SparseCategoricalCrossentropy(),
+            metrics=[tf.keras.metrics.CategoricalAccuracy(name="accuracy")],
+        )
 
     history_fine = model.fit(
         train_dataset,

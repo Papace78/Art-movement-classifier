@@ -25,13 +25,12 @@ def get_data(batch_size=32, image_size=(224, 224), validation_split=0.2):
     return my_paintings.fetch()
 
 
-def create_model(n_classes=8, fine_tune=0):
+def create_model(n_classes=8):
 
     my_model = My_Model()
 
     my_model = my_model.initialize_model(
         n_classes=n_classes,
-        fine_tune=fine_tune,
     )
 
     return my_model
