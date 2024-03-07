@@ -10,6 +10,8 @@ from transfer_learning.components.model import (
     evaluate_model,
 )
 
+from keras.models import load_model
+
 import os
 from colorama import Fore, Style
 import numpy as np
@@ -78,3 +80,12 @@ def classification(
         learning_curves(history, title="feature_extraction")
 
     print(accuracy)
+
+
+def prediction(test_dataset):
+
+    model = load_model(f'../model/finetune.keras')
+
+    prediction = model.predict(test_dataset)
+
+    return prediction

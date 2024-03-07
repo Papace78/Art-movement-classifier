@@ -127,6 +127,8 @@ def train_model(model, train_dataset, validation_dataset):
         class_weight = get_class_weights()
     )
 
+    model.save(f'../model/frozen.keras')
+
     return history
 
 
@@ -171,6 +173,8 @@ def finetune_model(model, history, train_dataset, validation_dataset, finetune):
         class_weight = get_class_weights()
     )
 
+    model.save(f'../model/finetune.keras')
+
     return history_fine
 
 
@@ -178,6 +182,7 @@ def evaluate_model(model, test_dataset):
     loss, accuracy = model.evaluate(test_dataset)
     print("\nTest accuracy:", accuracy)
     return accuracy
+
 
 
 def get_class_weights():

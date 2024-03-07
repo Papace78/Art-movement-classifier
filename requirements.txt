@@ -23,3 +23,8 @@ tqdm
 
 #cli
 typer
+
+#api
+fastapi
+uvicorn
+#PICKLE???
