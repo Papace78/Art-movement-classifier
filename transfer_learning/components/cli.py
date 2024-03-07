@@ -13,6 +13,10 @@ def classify(
     n_classes: int = typer.Option(8, help="Number of movements to classify."),
 ):
 
+    """
+    Train a new classifier
+    """
+
     classification(
         finetune=finetune,
         batch_size=batch_size,
@@ -23,6 +27,10 @@ def classify(
 
 @app.command()
 def predict(test_ds = 'raw_data/wikiart/test_directory'):
+
+    """
+    Get prediction from latest finetuned model
+    """
 
     predict = prediction(test_dataset=test_ds)
 
