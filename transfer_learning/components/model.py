@@ -9,7 +9,10 @@ from keras.layers import (
 )
 from keras.callbacks import ModelCheckpoint, EarlyStopping, ReduceLROnPlateau
 
+
 import tensorflow as tf
+import os
+
 
 
 class My_Model:
@@ -20,7 +23,7 @@ class My_Model:
     def __init__(self):
         pass
 
-    def initialize_model(self, n_classes=8):
+    def initialize_model(self, n_classes=8, class_weights = {}):
         """
         Compiles a model integrated with VGG16 pretrained layers
 
@@ -53,7 +56,6 @@ class My_Model:
             input_shape=self.INPUT_SHAPE, include_top=False, weights="imagenet"
         )
         vgg16_model.trainable = False
-        learning_rate = self.LEARNING_RATE
 
 
         # ------CLASSIFICATION LAYERS
@@ -86,10 +88,11 @@ class My_Model:
 
         # -------COMPILE
         # Compiles the model for training.
+
         model.compile(
-            optimizer=tf.keras.optimizers.Adam(learning_rate=learning_rate),
+            optimizer=tf.keras.optimizers.Adam(learning_rate=self.LEARNING_RATE),
             loss=tf.keras.losses.SparseCategoricalCrossentropy(),
-            metrics=[tf.keras.metrics.CategoricalAccuracy(name="accuracy")],
+            metrics=[tf.keras.metrics.CategoricalAccuracy(name="accuracy")]
         )
 
         return model
@@ -121,6 +124,7 @@ def train_model(model, train_dataset, validation_dataset):
         validation_data=validation_dataset,
         epochs=initial_epochs,
         callbacks=[es, checkpoint, LRreducer],
+        class_weight = get_class_weights()
     )
 
     return history
@@ -143,7 +147,7 @@ def finetune_model(model, history, train_dataset, validation_dataset, finetune):
 
     ## Callbacks
     checkpoint = ModelCheckpoint(
-        filepath="tl_model_v1.weights.best.hdf5", save_best_only=True, verbose=1
+        filepath="tl_model_v1_finetuned.weights.best.hdf5", save_best_only=True, verbose=1
     )
     es = EarlyStopping(
         monitor="val_loss", patience=10, restore_best_weights=True, mode="min"
@@ -164,6 +168,7 @@ def finetune_model(model, history, train_dataset, validation_dataset, finetune):
         initial_epochs=history.epoch[-1],
         validation_data=validation_dataset,
         callbacks=[es, checkpoint, LRreducer],
+        class_weight = get_class_weights()
     )
 
     return history_fine
@@ -173,3 +178,28 @@ def evaluate_model(model, test_dataset):
     loss, accuracy = model.evaluate(test_dataset)
     print("\nTest accuracy:", accuracy)
     return accuracy
+
+
+def get_class_weights():
+    trainval_dir = "raw_data/wikiart/trainval_directory"
+    label_counts={}
+    for style in os.listdir(trainval_dir):
+        label_counts[style] = len(os.listdir(os.path.join(trainval_dir,style)))
+
+    total_samples = sum(label_counts.values())
+
+    label_weights = {}
+    for k, v in label_counts.items():
+        label_weights[k] = total_samples / (len(label_counts) * v)
+
+    # Get the list of class names (directory names)
+    class_names = sorted(os.listdir(trainval_dir))
+
+    # Map class names to class labels
+    class_name_to_label = {i: class_name for i, class_name in enumerate(class_names)}
+
+    class_weights={}
+    for label, style in class_name_to_label.items():
+        class_weights[label] = label_weights[style]
+
+    return class_weights

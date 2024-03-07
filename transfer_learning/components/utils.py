@@ -3,6 +3,7 @@ from transfer_learning.components.model import My_Model
 from transfer_learning.components.sorter import Sorter
 
 import matplotlib.pyplot as plt
+import os
 
 
 
@@ -25,12 +26,13 @@ def get_data(batch_size=32, image_size=(224, 224), validation_split=0.2):
     return my_paintings.fetch()
 
 
+
 def create_model(n_classes=8):
 
     my_model = My_Model()
 
     my_model = my_model.initialize_model(
-        n_classes=n_classes,
+        n_classes=n_classes
     )
 
     return my_model

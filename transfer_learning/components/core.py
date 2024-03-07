@@ -21,7 +21,6 @@ def classification(
     image_size=(224, 224),
     validation_split=0.2,
     n_classes=8,
-    learning_rate=0.0001,
 ):
     print("\nFinetune =", finetune)
 
@@ -41,6 +40,7 @@ def classification(
     #   two dense layer
     #   dropout 0.2
     #   classification layer
+
 
     vgg16 = create_model(n_classes=n_classes)
 
