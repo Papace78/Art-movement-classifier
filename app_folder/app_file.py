@@ -1,43 +1,50 @@
-from fastapi import FastAPI
-##import pickle
-from transfer_learning.components.test_api import forecast
-from transfer_learning.components.core import classification, prediction
+from fastapi import FastAPI, File, UploadFile
+
+import uuid
+from keras.models import load_model
+import tensorflow as tf
+
+import os
+import numpy as np
+from fastapi.responses import FileResponse
+import matplotlib.pyplot as plt
 
 app = FastAPI()
+model = load_model(f"./model/tobedeleted.keras")
 
 # define root
-# first endpoint
 @app.get("/")
 def status():
     return {"API": "connected"}
 
-@app.get("/predict")
-def predict(X=5):
 
-    #model = pickle.load_model()
-    prediction = forecast(X)
-
-    return {'forecast': prediction}
-
-@app.get("/train")
-def training(finetune=17,
-        batch_size=32,
-        image_size=(224,224),
-        validation_split=0.2,
-        n_classes=8):
-
-    return classification(
-        finetune=finetune,
-        batch_size=batch_size,
-        image_size=(224,224),
-        validation_split=validation_split,
-        n_classes=n_classes,
-    )
+#@app.post("/file")
+#async def create_file(file: Annotated[bytes, File()]):
+ #   return {"file_size": len(file)}
 
 
-@app.get("/predict_real")
-def predict_real(test_ds):
+@app.post("/predict")
+async def create_upload_file(file: UploadFile= File(...)):
 
-    predict = prediction(test_dataset=test_ds)
+    file.filename = f'{uuid.uuid4()}.jpg'
+    contents = await file.read()
 
-    return {'prediction' : predict}
+    with open(f"raw_data/{file.filename}", "wb") as f:
+        f.write(contents)
+
+    img_path = os.path.join('raw_data',file.filename)
+    img = plt.imread(img_path)
+
+
+    tensor_image = tf.convert_to_tensor(img)
+    tensor_image = tf.image.resize(img,(224,224), method = 'nearest')
+    tensor_image = tf.expand_dims(tensor_image, axis = 0)
+
+    y_pred = model.predict(tensor_image)
+
+    my_pred = str(np.argmax(y_pred))
+
+    return my_pred
+
+
+    #return FileResponse(img_path)

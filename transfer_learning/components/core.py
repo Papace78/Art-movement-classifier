@@ -11,8 +11,6 @@ from transfer_learning.components.sorter import Sorter
 from transfer_learning.components.paintings import Paintings
 from transfer_learning.components.model import My_Model
 
-from keras.models import load_model
-
 import os
 import tensorflow as tf
 from colorama import Fore, Style
@@ -106,12 +104,3 @@ def classification(
         learning_curves(history, title="feature_extraction")
 
     return loss, accuracy
-
-
-def prediction(test_dataset):
-
-    model = load_model(f"../model/finetune.keras")
-
-    prediction = model.predict(test_dataset)
-
-    return prediction
