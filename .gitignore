@@ -10,9 +10,10 @@ notebooks/
 __pycache__
 *checkpoint.ipynb
 *.ipynb_checkpoints
-
+*.ipynb
 model/
 
+*.jpg
 
 .gitignore
 
