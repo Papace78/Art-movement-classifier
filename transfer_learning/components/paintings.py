@@ -6,7 +6,19 @@ from colorama import Style, Fore
 
 
 class Paintings:
+    """
+    Create three tf dataset (train/val/test) from directory
+    Using method .fetch()
 
+    INPUT:
+    Sorter - in order to get trainval and test directories path to import from.
+    batch_size
+    image_size = (224,224) by default for vgg16
+    validation split between train and val
+
+    OUTPUT:
+    batched and prefetched train_ds val_ds test_ds
+    """
 
     def __init__(
         self,
@@ -24,16 +36,6 @@ class Paintings:
     def sort(self):
         self.sorter.sort()
 
-    def where(self):
-        print(
-            Fore.BLUE + f"\n{self.sorter.trainval_dir}" + Style.RESET_ALL
-        )
-        print(f"containing: {os.listdir(self.sorter.trainval_dir)}")
-
-        print(Fore.BLUE + f"\n\n{self.sorter.test_dir}" + Style.RESET_ALL)
-        print(f"containing: {os.listdir(self.sorter.test_dir)}\n\n")
-
-
     def fetch(self):
         print("\n\nFetching:")
         self.where()
@@ -47,6 +49,7 @@ class Paintings:
             seed=42,
             interpolation="nearest",
             crop_to_aspect_ratio=True,
+            shuffle=True
         )
 
         test = tf.keras.utils.image_dataset_from_directory(
@@ -55,6 +58,7 @@ class Paintings:
             image_size=self.image_size,
             interpolation="nearest",
             crop_to_aspect_ratio=True,
+            shuffle=True
         )
 
         AUTOTUNE = tf.data.AUTOTUNE
@@ -64,3 +68,10 @@ class Paintings:
         test_ds = test.prefetch(buffer_size=AUTOTUNE)
 
         return train_ds, val_ds, test_ds
+
+    def where(self):
+        print(Fore.BLUE + f"\nFrom folder: {self.sorter.trainval_dir}," + Style.RESET_ALL)
+        print(f"containing: {os.listdir(self.sorter.trainval_dir)}")
+
+        print(Fore.BLUE + f"\n\nFrom folder: {self.sorter.test_dir}," + Style.RESET_ALL)
+        print(f"containing: {os.listdir(self.sorter.test_dir)}\n\n")

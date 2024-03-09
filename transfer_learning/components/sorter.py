@@ -1,19 +1,26 @@
-"""
-train/test split on local drive
-We will then split train/val directly inside tf.image_dataset_from_directory
-
-End result:
-Three folders "train" "validation" "test"
-Each folder will have all 8 subfolders, aka labels,
-containting the paintings.jpg.
-"""
-
 import os
 import shutil
 import random
 
 
 class Sorter:
+    """
+    Create and move paintings to
+    trainval_directory
+    test_directory
+
+    INPUT:
+    source directory path
+    trainval_directory path to be created and store images
+    test_directory path to be created and store images
+    split ratio
+
+    End result:
+    two folders "trainval_directory" "test_directory"
+    Each folder will have all 8 subfolders, aka labels,
+    containting the paintings.jpg.
+    """
+
     def __init__(
         self,
         source_dir="raw_data/wikiart/in_work",

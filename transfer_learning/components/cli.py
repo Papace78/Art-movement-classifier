@@ -11,6 +11,7 @@ def classify(
     batch_size: int = typer.Option(32, help="Paintings per batch."),
     validation_split: float = typer.Option(0.2, help="Split raito."),
     n_classes: int = typer.Option(8, help="Number of movements to classify."),
+    learning_rate : float = typer.Option(0.0001, help = 'LR for frozen, LR/10 for finetune')
 ):
 
     """
@@ -23,6 +24,7 @@ def classify(
         image_size=(224,224),
         validation_split=validation_split,
         n_classes=n_classes,
+        learning_rate=learning_rate
     )
 
 @app.command()

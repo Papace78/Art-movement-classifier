@@ -1,42 +1,4 @@
-from transfer_learning.components.paintings import Paintings
-from transfer_learning.components.model import My_Model
-from transfer_learning.components.sorter import Sorter
-
 import matplotlib.pyplot as plt
-import os
-
-
-
-def sort_files(source_dir="raw_data/wikiart/in_work"):
-    sort = Sorter(source_dir)
-    sort.sort()
-
-    return print("✅ All sorted")
-
-
-def get_data(batch_size=32, image_size=(224, 224), validation_split=0.2):
-
-    my_paintings = Paintings(
-        sorter=Sorter(),
-        batch_size=batch_size,
-        image_size=image_size,
-        validation_split=validation_split,
-    )
-
-    return my_paintings.fetch()
-
-
-
-def create_model(n_classes=8):
-
-    my_model = My_Model()
-
-    my_model = my_model.initialize_model(
-        n_classes=n_classes
-    )
-
-    return my_model
-
 
 def learning_curves(history, title = 'myman.png'):
     acc = history.history['accuracy']
@@ -65,3 +27,7 @@ def learning_curves(history, title = 'myman.png'):
 
     plt.savefig(title)
     plt.close()
+
+def confusion_matrix(model, val_ds):
+    #todo
+    pass
