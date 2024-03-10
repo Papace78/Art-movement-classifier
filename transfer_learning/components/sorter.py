@@ -2,7 +2,7 @@ import os
 import shutil
 import random
 
-from transfer_learning.components.params import (
+from params import (
     SOURCE_DIR,
     TRAINVAL_DIR,
     TEST_DIR,

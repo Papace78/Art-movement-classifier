@@ -2,9 +2,10 @@ import os
 import typer
 
 from keras.models import load_model
-from transfer_learning.components.core import classification
-from transfer_learning.components.model import predict_model
-from transfer_learning.components.params import FINETUNE, BATCH_SIZE, N_CLASSES, LR, IMAGE_SIZE
+
+from core import classification
+from vgg16 import predict_model
+from params import FINETUNE, BATCH_SIZE, N_CLASSES, LR, IMAGE_SIZE
 
 
 app = typer.Typer(add_completion=False)
@@ -25,7 +26,7 @@ def classify(
     classification(
         finetune=finetune,
         batch_size=batch_size,
-        image_size= IMAGE_SIZE,
+        image_size=IMAGE_SIZE,
         validation_split=validation_split,
         n_classes=n_classes,
         learning_rate=learning_rate,

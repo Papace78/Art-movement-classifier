@@ -3,13 +3,13 @@ import tensorflow as tf
 import numpy as np
 
 from colorama import Fore, Style
-from transfer_learning.components.model import (
+from vgg16 import (
     train_model,
     finetune_recompile,
     finetune_model,
     evaluate_model,
 )
-from transfer_learning.components.params import (
+from params import (
     SOURCE_DIR,
     BATCH_SIZE,
     FINETUNE,
@@ -17,10 +17,10 @@ from transfer_learning.components.params import (
     N_CLASSES,
     LR,
 )
-from transfer_learning.components.sorter import Sorter
-from transfer_learning.components.paintings import Paintings
-from transfer_learning.components.model import My_Model
-from transfer_learning.components.plots import learning_curves
+from sorter import Sorter
+from tfpaintings import Paintings
+from vgg16 import My_Model
+from plots import learning_curves
 
 
 def classification(

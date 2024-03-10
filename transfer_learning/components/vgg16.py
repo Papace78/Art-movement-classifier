@@ -14,7 +14,7 @@ from keras.layers import (
 )
 from keras.callbacks import ModelCheckpoint, EarlyStopping, ReduceLROnPlateau
 
-from transfer_learning.components.params import (
+from params import (
     TRAINVAL_DIR,
     IMAGE_SHAPE,
     CLASS_NAMES,

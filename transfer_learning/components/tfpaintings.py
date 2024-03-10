@@ -1,8 +1,8 @@
 import tensorflow as tf
 import os
 
-from transfer_learning.components.sorter import Sorter
-from transfer_learning.components.params import BATCH_SIZE, IMAGE_SIZE
+from sorter import Sorter
+from params import BATCH_SIZE, IMAGE_SIZE
 from colorama import Style, Fore
 
 

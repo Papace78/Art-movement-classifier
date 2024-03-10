@@ -6,7 +6,7 @@ from keras.models import load_model
 from fastapi import FastAPI, File, UploadFile
 from fastapi.responses import FileResponse
 
-from transfer_learning.components.model import predict_model
+from transfer_learning.components.vgg16 import predict_model
 from transfer_learning.components.params import FINETUNE
 
 app = FastAPI()
