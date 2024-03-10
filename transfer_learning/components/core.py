@@ -34,7 +34,7 @@ def classification(
     print("\nFinetune =", finetune)
 
     # CREATE TRAINVAL and TEST DIRECTORIES
-    if not "trainval_directory" in os.listdir(SOURCE_DIR):
+    if not "trainval_dir" in os.listdir('paintings'):
         sort = Sorter(SOURCE_DIR)
         sort.sort()
         print("✅ All sorted")
