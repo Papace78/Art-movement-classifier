@@ -1,16 +1,16 @@
-from fastapi import FastAPI, File, UploadFile
-
-import uuid
-from keras.models import load_model
-import tensorflow as tf
-
-import os
-import numpy as np
-from fastapi.responses import FileResponse
 import matplotlib.pyplot as plt
+import uuid
+import os
+
+from keras.models import load_model
+from fastapi import FastAPI, File, UploadFile
+from fastapi.responses import FileResponse
+
+from transfer_learning.components.model import predict_model
+from transfer_learning.components.params import FINETUNE
 
 app = FastAPI()
-model = load_model(f"./model/tobedeleted.keras")
+model = load_model(os.path.join('model',f'finetune_{FINETUNE}'))
 
 
 # define root
@@ -30,20 +30,15 @@ async def create_upload_file(file: UploadFile = File(...)):
     file.filename = f"{uuid.uuid4()}.jpg"
     contents = await file.read()
 
-    with open(f"raw_data/{file.filename}", "wb") as f:
+    with open(os.path.join("uploaded_painting",file.filename), "wb") as f:
         f.write(contents)
 
-    img_path = os.path.join("raw_data", file.filename)
-    img = plt.imread(img_path)
+    img_path = os.path.join("uploaded_painting", file.filename)
 
-    tensor_image = tf.convert_to_tensor(img)
-    tensor_image = tf.image.resize(img, (224, 224), method="nearest")
-    tensor_image = tf.expand_dims(tensor_image, axis=0)
+    _ , y_label ,y_name = predict_model(model, img_path)
+    y_label = int(y_label)
 
-    y_pred = model.predict(tensor_image)
+    return {'mypred' : [y_label, y_name]}
 
-    my_pred = str(np.argmax(y_pred))
-
-    return my_pred
-
+    #img = plt.imread(img_path)
     # return FileResponse(img_path)

@@ -1,19 +1,23 @@
+import os
 import typer
 
-from transfer_learning.components.core import classification, prediction
+from keras.models import load_model
+from transfer_learning.components.core import classification
+from transfer_learning.components.model import predict_model
+from transfer_learning.components.params import FINETUNE, BATCH_SIZE, N_CLASSES, LR, IMAGE_SIZE
 
 
 app = typer.Typer(add_completion=False)
 
+
 @app.command()
 def classify(
-    finetune: int = typer.Option(17, help="Number of vgg16 layers to train."),
-    batch_size: int = typer.Option(32, help="Paintings per batch."),
+    finetune: int = typer.Option(FINETUNE, help="Number of vgg16 layers to train."),
+    batch_size: int = typer.Option(BATCH_SIZE, help="Paintings per batch."),
     validation_split: float = typer.Option(0.2, help="Split raito."),
-    n_classes: int = typer.Option(8, help="Number of movements to classify."),
-    learning_rate : float = typer.Option(0.0001, help = 'LR for frozen, LR/10 for finetune')
+    n_classes: int = typer.Option(N_CLASSES, help="Number of movements to classify."),
+    learning_rate: float = typer.Option(LR, help="LR for frozen, LR/10 for finetune"),
 ):
-
     """
     Train a new classifier
     """
@@ -21,21 +25,29 @@ def classify(
     classification(
         finetune=finetune,
         batch_size=batch_size,
-        image_size=(224,224),
+        image_size= IMAGE_SIZE,
         validation_split=validation_split,
         n_classes=n_classes,
-        learning_rate=learning_rate
+        learning_rate=learning_rate,
     )
 
-@app.command()
-def predict(test_ds = 'raw_data/wikiart/test_directory'):
 
+@app.command()
+def predict(
+    image_path: str = typer.Option(
+        "raw_data/wikiart/test_directory", help="Path to the image"
+    )
+):
     """
     Get prediction from latest finetuned model
     """
+    model = load_model(os.path.join("model", "frozen"))
 
-    predict = prediction(test_dataset=test_ds)
+    y_array, y_pred, y_name = predict_model(model, image_path=image_path)
+    print("\ny_array:", y_array)
+    print("\ny_pred, y_name:", [y_pred, y_name])
 
-    return {'prediction' : predict}
+    return {"prediction": [y_pred, y_name]}
+
 
 app()

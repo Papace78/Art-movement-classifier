@@ -2,6 +2,7 @@ import tensorflow as tf
 import os
 
 from transfer_learning.components.sorter import Sorter
+from transfer_learning.components.params import BATCH_SIZE, IMAGE_SIZE
 from colorama import Style, Fore
 
 
@@ -23,8 +24,8 @@ class Paintings:
     def __init__(
         self,
         sorter=Sorter(),
-        batch_size=32,
-        image_size=(224,224),
+        batch_size=BATCH_SIZE,
+        image_size=IMAGE_SIZE,
         validation_split=0.2,
     ):
 
@@ -33,8 +34,6 @@ class Paintings:
         self.image_size = image_size
         self.validation_split = validation_split
 
-    def sort(self):
-        self.sorter.sort()
 
     def fetch(self):
         print("\n\nFetching:")

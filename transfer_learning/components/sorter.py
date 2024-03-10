@@ -2,6 +2,13 @@ import os
 import shutil
 import random
 
+from transfer_learning.components.params import (
+    SOURCE_DIR,
+    TRAINVAL_DIR,
+    TEST_DIR,
+    SPLIT_RATIO,
+)
+
 
 class Sorter:
     """
@@ -23,10 +30,10 @@ class Sorter:
 
     def __init__(
         self,
-        source_dir="raw_data/wikiart/in_work",
-        trainval_dir="raw_data/wikiart/trainval_directory",
-        test_dir="raw_data/wikiart/test_directory",
-        split_ratio=0.9,
+        source_dir=SOURCE_DIR,
+        trainval_dir=TRAINVAL_DIR,
+        test_dir=TEST_DIR,
+        split_ratio=SPLIT_RATIO,
     ) -> None:
 
         self.source_dir = source_dir

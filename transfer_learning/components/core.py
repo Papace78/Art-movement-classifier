@@ -1,31 +1,35 @@
+import os
+import tensorflow as tf
+import numpy as np
+
+from colorama import Fore, Style
 from transfer_learning.components.model import (
     train_model,
     finetune_recompile,
     finetune_model,
     evaluate_model,
 )
-from transfer_learning.components.plots import learning_curves
-
-
+from transfer_learning.components.params import (
+    SOURCE_DIR,
+    BATCH_SIZE,
+    FINETUNE,
+    IMAGE_SIZE,
+    N_CLASSES,
+    LR,
+)
 from transfer_learning.components.sorter import Sorter
 from transfer_learning.components.paintings import Paintings
 from transfer_learning.components.model import My_Model
-
-import os
-import tensorflow as tf
-from colorama import Fore, Style
-import numpy as np
-
-SOURCE_DIR = "raw_data/wikiart/"
+from transfer_learning.components.plots import learning_curves
 
 
 def classification(
-    finetune=17,
-    batch_size=32,
-    image_size=(224, 224),
+    finetune=FINETUNE,
+    batch_size=BATCH_SIZE,
+    image_size=IMAGE_SIZE,
     validation_split=0.2,
-    n_classes=8,
-    learning_rate=0.0001,
+    n_classes=N_CLASSES,
+    learning_rate=LR,
 ):
     print("\nFinetune =", finetune)
 
@@ -69,8 +73,6 @@ def classification(
         {round(np.min(history.history['val_accuracy']), 2)}"
     )
 
-
-
     # FINETUNE MODEL
     if finetune:
         print(
@@ -87,20 +89,23 @@ def classification(
             finetune=finetune,
         )
 
+        # PLOT LEARNING CURVES
+        learning_curves(history_fine, title="finetunening")
+        print(f"✅ Saved learning_curves")
+
         # EVALUATE MODEL
-        print(Fore.BLUE + f"\nTesting fine model on {len(test)} rows..." + Style.RESET_ALL)
+        print(
+            Fore.BLUE + f"\nTesting fine model on {len(test)} rows..." + Style.RESET_ALL
+        )
         loss, accuracy = evaluate_model(vgg16_fine, test)
         print(f"✅ Model tested, accuracy: {round(accuracy*100, 2)}%")
 
-        # PLOT LEARNING CURVES
-        learning_curves(history_fine, title="finetunening")
-
     else:
+        learning_curves(history, title="feature_extraction")
+        print(f"✅ Saved learning_curves")
+
         print(Fore.BLUE + f"\nTesting model on {len(test)} rows..." + Style.RESET_ALL)
         loss, accuracy = evaluate_model(vgg16, test)
         print(f"✅ Model tested, accuracy: {round(accuracy*100, 2)}%")
-
-
-        learning_curves(history, title="feature_extraction")
 
     return loss, accuracy

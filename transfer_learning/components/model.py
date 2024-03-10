@@ -1,3 +1,8 @@
+import numpy as np
+import tensorflow as tf
+import os
+
+
 from keras.layers import (
     Dense,
     Dropout,
@@ -9,9 +14,14 @@ from keras.layers import (
 )
 from keras.callbacks import ModelCheckpoint, EarlyStopping, ReduceLROnPlateau
 
-
-import tensorflow as tf
-import os
+from transfer_learning.components.params import (
+    TRAINVAL_DIR,
+    IMAGE_SHAPE,
+    CLASS_NAMES,
+    N_CLASSES,
+    FINETUNE,
+    LR,
+)
 
 
 class My_Model:
@@ -30,12 +40,10 @@ class My_Model:
     OUTPUT: Model
     """
 
-    INPUT_SHAPE = (224, 224, 3)
-
     def __init__(self):
         pass
 
-    def initialize_model(self, n_classes=8):
+    def initialize_model(self, n_classes=N_CLASSES):
 
         # -------DATA AUGMENTATION
 
@@ -54,7 +62,7 @@ class My_Model:
         # --------VGG16
 
         vgg16_model = tf.keras.applications.VGG16(
-            input_shape=self.INPUT_SHAPE, include_top=False, weights="imagenet"
+            input_shape=IMAGE_SHAPE, include_top=False, weights="imagenet"
         )
         vgg16_model.trainable = False
 
@@ -68,7 +76,7 @@ class My_Model:
 
         # -------ARCHITECTURE
 
-        inputs = tf.keras.Input(shape=self.INPUT_SHAPE)
+        inputs = tf.keras.Input(shape=IMAGE_SHAPE)
         x = data_augmentation(inputs)
         x = preprocess_input(x)
         x = vgg16_model(x, training=False)
@@ -85,7 +93,6 @@ class My_Model:
         return model
 
 
-
 def train_model(model, train_dataset, validation_dataset):
 
     print("\nEvaluating initial loss and accuracy...")
@@ -95,7 +102,9 @@ def train_model(model, train_dataset, validation_dataset):
 
     ## Callbacks
     checkpoint = ModelCheckpoint(
-        filepath="tl_model_v1.weights.best.hdf5", save_best_only=True, verbose=1
+        filepath=os.path.join("model", "tl_model_v1.weights.best.hdf5"),
+        save_best_only=True,
+        verbose=1,
     )
     es = EarlyStopping(
         monitor="val_loss", patience=5, restore_best_weights=True, mode="min"
@@ -114,12 +123,12 @@ def train_model(model, train_dataset, validation_dataset):
         class_weight=get_class_weights(),
     )
 
-    model.save(f"../model/frozen.keras")
+    model.save(os.path.join("model", "frozen"))
 
     return history
 
 
-def finetune_recompile(model, finetune = 17, learning_rate= 0.00001):
+def finetune_recompile(model, finetune=FINETUNE, learning_rate=LR / 10):
     """Make top vgg16 layers trainable and recompile"""
     model.layers[4].trainable = True
 
@@ -138,8 +147,6 @@ def finetune_recompile(model, finetune = 17, learning_rate= 0.00001):
     )
     print("\nnumber of trainable variable:", len(model.trainable_variables))
 
-
-
     model.compile(
         optimizer=tf.keras.optimizers.Adam(learning_rate=learning_rate),
         loss=tf.keras.losses.SparseCategoricalCrossentropy(),
@@ -149,10 +156,12 @@ def finetune_recompile(model, finetune = 17, learning_rate= 0.00001):
     return model
 
 
-def finetune_model(model, history, train_dataset, validation_dataset, finetune):
+def finetune_model(
+    model, history, train_dataset, validation_dataset, finetune=FINETUNE
+):
     ## Callbacks
     checkpoint = ModelCheckpoint(
-        filepath="tl_model_v1_finetuned.weights.best.hdf5",
+        filepath=os.path.join("model", "tl_model_v1.weights.best.hdf5"),
         save_best_only=True,
         verbose=1,
     )
@@ -172,7 +181,7 @@ def finetune_model(model, history, train_dataset, validation_dataset, finetune):
         class_weight=get_class_weights(),
     )
 
-    model.save(f"../model/finetune.keras")
+    model.save(os.path.join("model", f"finetune_{finetune}"))
 
     return history_fine
 
@@ -182,18 +191,33 @@ def evaluate_model(model, test_dataset):
     print("\nTest accuracy:", accuracy)
     return loss, accuracy
 
-def predict():
-    #TODO
-    pass
+
+def predict_model(
+    model, image_path=os.path.join("raw_data", "wikiart", "test_directory")
+):
+
+    image = tf.io.read_file(image_path)
+    image = tf.io.decode_jpeg(image, channels=3)
+    image = tf.image.resize(image, [224, 224])
+
+    y_pred_array = model.predict(tf.expand_dims(image, axis=0))
+    y_pred = np.argmax(y_pred_array)
+
+    class_names = CLASS_NAMES
+    # Map class names to class labels
+    class_name_to_label = {i: class_name for i, class_name in enumerate(class_names)}
+
+    y_name = class_name_to_label[y_pred]
+
+    return y_pred_array, y_pred, y_name
 
 
 def get_class_weights():
     """individual weight = (Total_samples / n_classes * len(individual_class))"""
 
-    trainval_dir = "raw_data/wikiart/trainval_directory"
     label_counts = {}
-    for style in os.listdir(trainval_dir):
-        label_counts[style] = len(os.listdir(os.path.join(trainval_dir, style)))
+    for style in os.listdir(TRAINVAL_DIR):
+        label_counts[style] = len(os.listdir(os.path.join(TRAINVAL_DIR, style)))
 
     total_samples = sum(label_counts.values())
 
@@ -202,7 +226,7 @@ def get_class_weights():
         label_weights[k] = total_samples / (len(label_counts) * v)
 
     # Get the list of class names (directory names)
-    class_names = sorted(os.listdir(trainval_dir))
+    class_names = sorted(os.listdir(TRAINVAL_DIR))
 
     # Map class names to class labels
     class_name_to_label = {i: class_name for i, class_name in enumerate(class_names)}
