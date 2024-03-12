@@ -10,7 +10,7 @@ matplotlib
 seaborn
 
 scikit-learn
-tensorflow
+tensorflow == 2.15.0.post1
 
 #for cv2
 opencv-python
@@ -27,4 +27,6 @@ typer
 #api
 fastapi
 uvicorn
+python-multipart
+
 #PICKLE???

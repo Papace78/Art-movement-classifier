@@ -3,7 +3,7 @@ import tensorflow as tf
 import os
 
 
-from keras.layers import (
+from tensorflow.keras.layers import (
     Dense,
     Dropout,
     GlobalAveragePooling2D,
@@ -12,7 +12,7 @@ from keras.layers import (
     RandomZoom,
     RandomWidth,
 )
-from keras.callbacks import ModelCheckpoint, EarlyStopping, ReduceLROnPlateau
+from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping, ReduceLROnPlateau
 
 from params import (
     TRAINVAL_DIR,

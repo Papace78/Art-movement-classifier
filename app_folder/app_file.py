@@ -1,16 +1,14 @@
-import matplotlib.pyplot as plt
+import tensorflow as tf
 import uuid
 import os
 
-from keras.models import load_model
 from fastapi import FastAPI, File, UploadFile
-from fastapi.responses import FileResponse
 
 from transfer_learning.components.vgg16 import predict_model
 from transfer_learning.components.params import FINETUNE
 
 app = FastAPI()
-model = load_model(os.path.join('model',f'finetune_{FINETUNE}'))
+model = tf.keras.models.load_model(os.path.join('model',f'frozen_charlax_valacc_61'))
 
 
 # define root
@@ -39,6 +37,3 @@ async def create_upload_file(file: UploadFile = File(...)):
     y_label = int(y_label)
 
     return {'mypred' : [y_label, y_name]}
-
-    #img = plt.imread(img_path)
-    # return FileResponse(img_path)

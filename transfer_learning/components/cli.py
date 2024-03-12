@@ -1,7 +1,7 @@
 import os
 import typer
 
-from keras.models import load_model
+from tensorflow.keras.saving import load_model
 from colorama import Fore, Style
 
 from core import classification

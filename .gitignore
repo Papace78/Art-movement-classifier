@@ -2,7 +2,7 @@ raw_data/
 wikiart/
 ds_zipped/
 paintings/
-
+uploaded_painting/
 .python-version
 .env
 .envrc

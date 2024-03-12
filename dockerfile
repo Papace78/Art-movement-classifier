@@ -4,6 +4,9 @@ FROM python:3.10.6-buster
 # COPY -> select the folder you need
 COPY app_folder app_folder
 COPY requirements.txt requirements.txt
+# upload the model
+COPY model model
+COPY uploaded_painting uploaded_painting
 
 # RUN run terminal command
 RUN pip install --upgrade pip
@@ -14,6 +17,7 @@ RUN pip install -r requirements.txt
 COPY transfer_learning transfer_learning
 COPY setup.py setup.py
 RUN pip install .
+
 
 EXPOSE 8000
 
