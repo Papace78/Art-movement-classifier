@@ -153,11 +153,13 @@ def finetune_recompile(model, finetune=FINETUNE, learning_rate=LR / 10):
         metrics=["accuracy"],
     )
 
+    print(model.summary())
+
     return model
 
 
 def finetune_model(
-    model, history, train_dataset, validation_dataset, finetune=FINETUNE
+    model, train_dataset, validation_dataset, finetune=FINETUNE, history = None
 ):
     ## Callbacks
     checkpoint = ModelCheckpoint(
@@ -175,7 +177,6 @@ def finetune_model(
     history_fine = model.fit(
         train_dataset,
         epochs=1000,
-        initial_epochs=history.epoch[-1],
         validation_data=validation_dataset,
         callbacks=[es, checkpoint, LRreducer],
         class_weight=get_class_weights(),

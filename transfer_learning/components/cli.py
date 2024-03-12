@@ -2,10 +2,13 @@ import os
 import typer
 
 from keras.models import load_model
+from colorama import Fore, Style
 
 from core import classification
-from vgg16 import predict_model
+from vgg16 import finetune_recompile, finetune_model, evaluate_model, predict_model
 from params import FINETUNE, BATCH_SIZE, N_CLASSES, LR, IMAGE_SIZE
+from plots import learning_curves
+from tfpaintings import Paintings
 
 
 app = typer.Typer(add_completion=False)
@@ -42,13 +45,51 @@ def predict(
     """
     Get prediction from latest finetuned model
     """
-    model = load_model(os.path.join("model", "frozen"))
+    model = load_model(os.path.join("model", "finetune_17"))
 
     y_array, y_pred, y_name = predict_model(model, image_path=image_path)
     print("\ny_array:", y_array)
     print("\ny_pred, y_name:", [y_pred, y_name])
 
     return {"prediction": [y_pred, y_name]}
+
+
+@app.command()
+def finetuning(
+    finetune: int = typer.Option(
+        FINETUNE, help="Finetune the model, skipping the basic frozen training"
+    )
+):
+    """
+    Load and finetune a model pretrained on your own dataset
+    """
+
+    #LOAD MODEL
+    print("Finetune =", finetune)
+    model_frozen = load_model(os.path.join("model", "frozen"))
+    print("✅ Trained model loaded")
+    model_fine = finetune_recompile(model_frozen, finetune=finetune)
+
+    #FETCH DATA
+    my_paintings = Paintings()
+    train, val, test = my_paintings.fetch()
+
+    #TRAIN MODEL
+    print(Fore.BLUE + f"\nFinetuning model on {len(train)} rows..." + Style.RESET_ALL)
+    history_fine = finetune_model(
+        model_fine, train_dataset=train, validation_dataset=val, finetune=finetune
+    )
+
+    # PLOT LEARNING CURVES
+    learning_curves(history_fine, title=f"finetuned_{finetune}")
+    print(f"✅ Saved learning_curves")
+
+    # EVALUATE MODEL
+    print(Fore.BLUE + f"\nTesting fine model on {len(test)} rows..." + Style.RESET_ALL)
+    loss, accuracy = evaluate_model(model_fine, test)
+    print(f"✅ Model tested, accuracy: {round(accuracy*100, 2)}%")
+
+    return history_fine
 
 
 app()

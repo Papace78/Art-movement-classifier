@@ -67,6 +67,8 @@ def classification(
     # TRAIN MODEL on frozen vgg16
     print(Fore.BLUE + f"\nTraining model on {len(train)} rows..." + Style.RESET_ALL)
     history = train_model(vgg16, train, val)
+    learning_curves(history, title="feature_extraction")
+    print(f"✅ Saved learning_curves")
 
     print(
         f"✅ Model trained on {len(train)} rows with min val accuracy:\
@@ -83,10 +85,10 @@ def classification(
         )
         history_fine = finetune_model(
             vgg16_fine,
-            history=history,
             train_dataset=train,
             validation_dataset=val,
             finetune=finetune,
+            history=history,
         )
 
         # PLOT LEARNING CURVES
@@ -101,8 +103,6 @@ def classification(
         print(f"✅ Model tested, accuracy: {round(accuracy*100, 2)}%")
 
     else:
-        learning_curves(history, title="feature_extraction")
-        print(f"✅ Saved learning_curves")
 
         print(Fore.BLUE + f"\nTesting model on {len(test)} rows..." + Style.RESET_ALL)
         loss, accuracy = evaluate_model(vgg16, test)
