@@ -8,7 +8,7 @@ from transfer_learning.components.vgg16 import predict_model
 from transfer_learning.components.params import FINETUNE
 
 app = FastAPI()
-model = tf.keras.models.load_model(os.path.join('model',f'frozen_charlax_valacc_61'))
+model = tf.keras.models.load_model(os.path.join('model',f'finetune_15'))
 
 
 # define root
