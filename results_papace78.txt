@@ -30,3 +30,7 @@ New_dataset_transfer-learning frozen ==> 18 epoch / loss: 0.74 / acc: 0.66 / val
 finetune_17 ==>  22 epoch / loss: 0.60 / acc: 0.71 / val_loss: 1.02 / val_acc: 0.64
 	test_accuracy = 63.61%
 
+finetune_15 ==> 15 epoch / loss: 0.4550 / acc: 0.76 / val_loss: 1.10 / val_acc: 0.65
+	test_accuracy = 64.51%
+
+
