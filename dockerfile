@@ -25,7 +25,7 @@ EXPOSE 8000
 # uvicorn to control the server port
 # local
 
-CMD uvicorn app_folder.app_file:app --host 0.0.0.0
+#CMD uvicorn app_folder.app_file:app --host 0.0.0.0
 
 # Deploy to GCP
-#CMD uvicorn app_folder.app_file:app --host 0.0.0.0 --port $PORT
+CMD uvicorn app_folder.app_file:app --host 0.0.0.0 --port $PORT
