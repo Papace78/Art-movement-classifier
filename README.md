@@ -1,6 +1,6 @@
 # SMN: Painting Artistic Movement Deep Learning Classifier
 
-SMN is a deep learning project designed to classify paintings according to their artistic movements. I developed it during Le Wagon batch 1372 in March 2024. This project evolved through various experimental phases allowing me to work with data analysis, deep learning, cloud computing, and deployment strategies.
+SMN is a deep learning project designed to classify paintings according to their artistic movements. This project evolved through various experimental phases allowing me to work with data analysis, deep learning, cloud computing, and deployment strategies.
 
 ## Project course
 
